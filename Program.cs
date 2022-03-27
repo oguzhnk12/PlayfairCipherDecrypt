@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -11,21 +11,25 @@ namespace PlayfairCipher_decrypt_
     {
         static void Main(string[] args)
         {
+            //Tittle.
             Console.WriteLine("\t\t\t***** PLAYFAIR CIPHER METHOD *****\n\t\t\t  ***** DECRYPT PROGRAM *****");   
             string path = @"../../../ciphertext.txt";
+            
+
+            //Reading ciphertext from file.
             Boolean exist = File.Exists(path);
             string ciphertext;
             char[] cipher = new char[999];
             if (exist)
             {
                 ciphertext = File.ReadAllText(path);
-                cipher = OmitJ(ciphertext.ToCharArray());
+                cipher = ReplaceWithI(ciphertext.ToCharArray());
                 ciphertext = new string(cipher);
                 if (ciphertext.All(c => Char.IsLetter(c)))
                 {
                     if (!(ciphertext.Length < 6))
                     {
-                        cipher = OmitJ(ciphertext.ToUpper().ToCharArray());
+                        cipher = ReplaceWithI(ciphertext.ToUpper().ToCharArray());
                         if (cipher.Length % 2 != 0)
                             cipher = cipher.Take(cipher.Length - 1).ToArray();
                     }
@@ -52,8 +56,11 @@ namespace PlayfairCipher_decrypt_
                 Console.ReadKey();
                 return;
             }
+
+
+            //Menu for getting valid keyword from user.
             Boolean validate = false;
-            string keyword = "";
+            string keyword = ""; //
             do
             {
                 Console.WriteLine("Please enter the keyword.\n");
@@ -70,10 +77,12 @@ namespace PlayfairCipher_decrypt_
                     Console.WriteLine("You typed nothing, please try again.");
                 }
             } while(!validate);
-            char[] keywordArray = OmitJ(keyword.ToUpper().ToCharArray());
+            char[] keywordArray = ReplaceWithI(keyword.ToUpper().ToCharArray());
             keywordArray = RemoveDuplication(keywordArray);
-            //Alphabet array creating
-            char[] alphabet = new char[26];
+
+
+            //Creating an alphabet array.
+            char[] alphabet = new char[26]; 
             int index = 0;
             for (char letter = 'A'; letter <= 'Z'; letter++)
             {
@@ -83,6 +92,10 @@ namespace PlayfairCipher_decrypt_
                     index++;
                 }
             }
+
+
+            /*Concating two arrays with removing duplicated letters 
+             and inserting values to the two dimension array(matrix).*/
             char[] matrixLetter = keywordArray.Concat(alphabet).ToArray();
             matrixLetter = RemoveDuplication(matrixLetter);
             char[,] matrix = new char[5,5];
@@ -95,13 +108,22 @@ namespace PlayfairCipher_decrypt_
                     index++;
                 }
             }
+
+
+            /*Implementing playfair cipher decryption method the matrix
+            to getting plainext.*/
             string plaintext = PlayfairCipher(matrix, cipher);
+
+            //Results
             Console.WriteLine("\n\nKeyword: \t" + keyword);
             Console.WriteLine("Ciphertext: \t" + ciphertext);
             Console.WriteLine("Plaintext: \t" + plaintext + "\n");
             Console.WriteLine("Please press any key for exit...");
             Console.ReadKey();
         }
+
+
+        //The fuction for remove duplicated letters in a char array.
         public static char[] RemoveDuplication(char[] charArray)
         {
             int check = 0;
@@ -120,7 +142,11 @@ namespace PlayfairCipher_decrypt_
             }
             return charArray;
         }
-        public static char[] OmitJ(char[] charArray)
+
+
+        /*The function for replacing J and İ with I.
+         Additionally, fuction removes whitespaces.*/
+        public static char[] ReplaceWithI(char[] charArray)
         {
             char space = (char)32;
             for (int c = 0; c < charArray.Length; c++)
@@ -132,6 +158,9 @@ namespace PlayfairCipher_decrypt_
             }
             return charArray;
         }
+
+        /*The fuction of playfair cipher decryption.
+        It returns to a string which is plaintext.*/
         public static string PlayfairCipher(char[,] matrix, char[] cipher)
         {
             string plaintextStr;
